@@ -1,7 +1,6 @@
 %% ============================================================
 %  FIRE HOTSPOT FORECAST EVALUATION - LEAKAGE-FREE VERSION
 %  Persistence vs Climate-all vs Phase-space, lead 1-14 days
-%  Setiap blok data langsung diikuti blok plotnya (gaya perintah biasa).
 % ============================================================
 clc; clear; close all;
 
