@@ -26,8 +26,7 @@ cfg.useLog1p       = false;
 cfg.minTrain       = 30;
 cfg.ninoMode       = 'interp';
 cfg.ninoLagDays    = 60;
-cfg.ninoPlotStart  = datetime(2016,1,1);  
-cfg.saveFigs       = true;     % simpan PNG 300 dpi
+cfg.saveFigs       = true;     
 
 if cfg.useLog1p
     tf  = @(y) log1p(y);
