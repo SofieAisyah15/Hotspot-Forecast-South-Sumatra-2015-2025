@@ -4,7 +4,7 @@
 % ============================================================
 clc; clear; close all;
 
-%% 0a. GLOBAL FONT / STYLE (default semua gambar)
+%% 0a. GLOBAL FONT 
 set(groot,'DefaultAxesFontSize',16, ...
           'DefaultAxesFontName','Arial', ...
           'DefaultAxesTitleFontWeight','bold', ...
@@ -21,12 +21,12 @@ cfg.horizon        = 90;
 cfg.selectedLeads  = [1 4 10 14];
 cfg.nTrees         = 100;
 cfg.seed           = 42;
-cfg.climateLearner = 'svm';    % 'svm' atau 'leastsquares'
+cfg.climateLearner = 'svm';    
 cfg.useLog1p       = false;
 cfg.minTrain       = 30;
 cfg.ninoMode       = 'interp'; % 'interp' atau 'hold'
 cfg.ninoLagDays    = 60;
-cfg.ninoPlotStart  = datetime(2016,1,1);  % awal plot Nino3.4 hasil interpolasi (PLOT 3b)
+cfg.ninoPlotStart  = datetime(2016,1,1);  
 cfg.saveFigs       = true;     % simpan PNG 300 dpi
 
 if cfg.useLog1p
@@ -131,7 +131,7 @@ fprintf('Tanggal hotspot %d | cuaca %d | cocok %d\n', ...
 assert(all(diff(commonDates)==days(1)), ...
     'Deret gabungan tidak kontinu: ada tanggal hilang. Isi dengan NaN dulu.');
 
-%% 5. NINO3.4 HARIAN TANPA KEBOCORAN (causal)
+%% 5. NINO3.4 HARIAN 
 switch cfg.ninoMode
     case 'hold'
         mIdx = interp1(datenum(months_n34), (1:numel(months_n34))', datenum(commonDates), 'previous', NaN);
@@ -146,7 +146,7 @@ switch cfg.ninoMode
         error('cfg.ninoMode harus ''hold'' atau ''interp''.');
 end
 
-% ---------- PLOT 3: Daily Nino 3.4 (causal, dipakai sebagai prediktor) ----------
+% ---------- PLOT 3: Daily Nino 3.4  ----------
 figure('Color','w','Position',[100 100 1500 650])
 plot(commonDates,ENSO_daily_lin,'k','linewidth',1.5)
 axis tight
@@ -158,7 +158,7 @@ title(sprintf('Daily Interpolated Nino 3.4',cfg.ninoMode))
 set(gca,'FontSize',14)
 if cfg.saveFigs, exportgraphics(gcf,'Fig3_Nino34.png','Resolution',300); end
 
-%% 6. DROUGHT INDICES (causal)
+%% 6. DROUGHT INDICES 
 spi3 = compute_spi(Precip,90);
 hth  = compute_hth(Precip,1);
 kbdi = compute_kbdi(Precip,Temp);
@@ -194,7 +194,7 @@ doy = day(commonDates,'dayofyear');
 X_climate_all = [Precip Temp RH Wind ENSO_daily_lin spi3 hth kbdi ...
                  sin(2*pi*doy/365) cos(2*pi*doy/365)];
 
-%% 8. REMOVE INVALID ROWS (harus hanya baris awal)
+%% 8. REMOVE INVALID ROWS 
 validRows = all(isfinite(X_climate_all),2) & isfinite(Y_hotspot);
 X_climate_all = X_climate_all(validRows,:);
 Y_hotspot     = Y_hotspot(validRows);
@@ -323,7 +323,7 @@ T_skill = table(leadTimes, nUsed, ...
 disp(T_skill);
 writetable(T_skill,'ModelSkill_pooled.xlsx');
 
-% ---------- PLOT 5: Model skill (3 panel, 1 legenda bersama) ----------
+% ---------- PLOT 5: Model skill  ----------
 figure('Color','w','Position',[100 100 1700 580])
 tl = tiledlayout(1,3,'TileSpacing','compact','Padding','loose');
 
@@ -372,7 +372,7 @@ for p = 1:numel(cfg.selectedLeads)
     tEnd   = min(tEnd,   max(s.target));
 end
 
-% ---------- PLOT 6: Selected leads (1 ylabel bersama di tengah) ----------
+% ---------- PLOT 6: Selected leads  ----------
 nL = numel(cfg.selectedLeads);
 figure('Color','w','Position',[100 100 1400 1050])
 tl = tiledlayout(nL,1,'TileSpacing','compact','Padding','loose');
@@ -395,12 +395,12 @@ for p = 1:nL
     if p < nL, set(gca,'XTickLabel',[]); end
 end
 linkaxes(axs,'x');
-yTop = ceil(1.1*yMax/10)*10;               % beri ruang di atas puncak (misal 96 -> 110)
+yTop = ceil(1.1*yMax/10)*10;               
 for p = 1:nL
     ylim(axs(p),[0 yTop])
     yticks(axs(p),0:50:ceil(yMax/50)*50)  % 0, 50, 100
 end
-ylabel(tl,'Hotspot Count','FontSize',18)                 % satu ylabel di tengah
+ylabel(tl,'Hotspot Count','FontSize',18)                 
 xlabel(tl,sprintf('Target Date (%d)',year(tEnd)),'FontSize',17)
 lgd = legend([g1 g2 g3 g4],{'Observed','Persistence','Climate-all','Phase-space'}, ...
     'Orientation','horizontal','Box','off');
@@ -431,15 +431,15 @@ for h = 1:maxLead
     end
 end
 oper_persist = repmat(Y_hotspot(end),maxLead,1);
-err_phase = E(:,3);                       % RMSE pooled sebagai skala ketidakpastian
-lowErr = min(err_phase, oper_phase);      % batas bawah tidak di bawah nol
+err_phase = E(:,3);                       
+lowErr = min(err_phase, oper_phase);      
 
 T_oper = table((1:maxLead)',futureDates,oper_persist,E(:,1),oper_phase,E(:,3), ...
     'VariableNames',{'Lead','Date','Persistence','Persist_RMSE','PhaseSpace','Phase_RMSE'});
 disp(T_oper); writetable(T_oper,'OperationalForecast.xlsx');
 
 % ---------- PLOT 7: Operational forecast ----------
-nDisplay = 30;                            % jumlah hari observasi yang ditampilkan
+nDisplay = 30;                            
 i0 = max(1,N-nDisplay+1);
 figure('Color','w','Position',[100 100 1500 650])
 hO = plot(commonDates(i0:end),Y_hotspot(i0:end),'ro-','linewidth',1.8,'MarkerSize',6);
